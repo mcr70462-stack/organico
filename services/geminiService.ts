@@ -2,12 +2,13 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Product } from "../types";
 
 export const generateRecipe = async (ingredients: Product[]) => {
+  // Initialization with explicit apiKey from process.env
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const ingredientNames = ingredients.map(i => i.name).join(", ");
   
   const prompt = `Crie uma receita saudável e criativa utilizando alguns ou todos os seguintes ingredientes disponíveis na minha cesta de orgânicos: ${ingredientNames}. 
   Você pode sugerir ingredientes adicionais comuns de despensa (sal, azeite, etc).
-  A resposta deve ser em JSON.`;
+  A resposta deve ser estritamente em JSON.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -37,7 +38,10 @@ export const generateRecipe = async (ingredients: Product[]) => {
       }
     });
 
-    return response.text ? JSON.parse(response.text) : null;
+    if (response.text) {
+      return JSON.parse(response.text);
+    }
+    return null;
   } catch (error) {
     console.error("Gemini Error:", error);
     throw error;

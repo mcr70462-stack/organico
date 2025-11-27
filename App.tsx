@@ -26,7 +26,11 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 
 // --- Components ---
 
-const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'outline' | 'danger' }> = ({ children, className = '', variant = 'primary', ...props }) => {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+}
+
+const Button: React.FC<ButtonProps> = ({ children, className = '', variant = 'primary', ...props }) => {
   const baseStyle = "px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2";
   const variants = {
     primary: "bg-leaf-600 text-white hover:bg-leaf-700 shadow-md hover:shadow-lg",
@@ -229,7 +233,7 @@ const CartDrawer = () => {
                       <details className="cursor-pointer">
                         <summary className="font-medium text-indigo-600">Ver modo de preparo</summary>
                         <ul className="mt-2 list-disc list-inside text-earth-700 space-y-1">
-                          {recipe.instructions.map((step: string, i: number) => (
+                          {recipe.instructions?.map((step: string, i: number) => (
                             <li key={i}>{step}</li>
                           ))}
                         </ul>
@@ -352,6 +356,7 @@ const AuthScreen = () => {
         </form>
         <div className="text-center">
           <button 
+            type="button"
             className="text-sm text-leaf-600 hover:text-leaf-500 font-medium"
             onClick={() => setView(view === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
           >
@@ -705,7 +710,7 @@ const App = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {products.map(product => (
+                  {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
