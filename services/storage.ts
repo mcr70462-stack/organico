@@ -53,57 +53,84 @@ const INITIAL_PRODUCTS: Product[] = [
 
 export const storage = {
   getProducts: (): Product[] => {
-    const data = localStorage.getItem(KEYS.PRODUCTS);
-    if (!data) {
-      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+    try {
+      const data = localStorage.getItem(KEYS.PRODUCTS);
+      if (!data) {
+        localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+        return INITIAL_PRODUCTS;
+      }
+      return JSON.parse(data);
+    } catch (e) {
+      console.error("Failed to parse products", e);
       return INITIAL_PRODUCTS;
     }
-    return JSON.parse(data);
   },
 
   saveProduct: (product: Product): void => {
-    const products = storage.getProducts();
-    const index = products.findIndex(p => p.id === product.id);
-    if (index >= 0) {
-      products[index] = product;
-    } else {
-      products.push(product);
+    try {
+      const products = storage.getProducts();
+      const index = products.findIndex(p => p.id === product.id);
+      if (index >= 0) {
+        products[index] = product;
+      } else {
+        products.push(product);
+      }
+      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    } catch (e) {
+      console.error("Failed to save product", e);
     }
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
   },
 
   deleteProduct: (id: string): void => {
-    const products = storage.getProducts().filter(p => p.id !== id);
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    try {
+      const products = storage.getProducts().filter(p => p.id !== id);
+      localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    } catch (e) {
+      console.error("Failed to delete product", e);
+    }
   },
 
   getUsers: (): User[] => {
-    const data = localStorage.getItem(KEYS.USERS);
-    return data ? JSON.parse(data) : [];
+    try {
+      const data = localStorage.getItem(KEYS.USERS);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error("Failed to parse users", e);
+      return [];
+    }
   },
 
   saveUser: (user: User): void => {
-    const users = storage.getUsers();
-    users.push(user);
-    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+    try {
+      const users = storage.getUsers();
+      users.push(user);
+      localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+    } catch (e) {
+      console.error("Failed to save user", e);
+    }
   },
 
   login: (email: string, password: string): User | null => {
-    // Admin Backdoor for Demo
-    if (email === 'admin@organico.com' && password === 'admin') {
-        const adminUser: User = { id: 'admin', name: 'Administrador', email, role: UserRole.ADMIN };
-        localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(adminUser));
-        return adminUser;
-    }
+    try {
+      // Admin Backdoor for Demo
+      if (email === 'admin@organico.com' && password === 'admin') {
+          const adminUser: User = { id: 'admin', name: 'Administrador', email, role: UserRole.ADMIN };
+          localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(adminUser));
+          return adminUser;
+      }
 
-    const users = storage.getUsers();
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      const { password, ...safeUser } = user;
-      localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(safeUser));
-      return safeUser as User;
+      const users = storage.getUsers();
+      const user = users.find(u => u.email === email && u.password === password);
+      if (user) {
+        const { password, ...safeUser } = user;
+        localStorage.setItem(KEYS.CURRENT_USER, JSON.stringify(safeUser));
+        return safeUser as User;
+      }
+      return null;
+    } catch (e) {
+      console.error("Login error", e);
+      return null;
     }
-    return null;
   },
 
   logout: (): void => {
@@ -111,19 +138,33 @@ export const storage = {
   },
 
   getCurrentUser: (): User | null => {
-    const data = localStorage.getItem(KEYS.CURRENT_USER);
-    return data ? JSON.parse(data) : null;
+    try {
+      const data = localStorage.getItem(KEYS.CURRENT_USER);
+      return data ? JSON.parse(data) : null;
+    } catch (e) {
+      console.error("Failed to get current user", e);
+      return null;
+    }
   },
 
   saveOrder: (order: Order): void => {
-    const data = localStorage.getItem(KEYS.ORDERS);
-    const orders = data ? JSON.parse(data) : [];
-    orders.push(order);
-    localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+    try {
+      const data = localStorage.getItem(KEYS.ORDERS);
+      const orders = data ? JSON.parse(data) : [];
+      orders.push(order);
+      localStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+    } catch (e) {
+      console.error("Failed to save order", e);
+    }
   },
   
   getOrders: (): Order[] => {
-     const data = localStorage.getItem(KEYS.ORDERS);
-     return data ? JSON.parse(data) : [];
+     try {
+       const data = localStorage.getItem(KEYS.ORDERS);
+       return data ? JSON.parse(data) : [];
+     } catch (e) {
+       console.error("Failed to get orders", e);
+       return [];
+     }
   }
 };
